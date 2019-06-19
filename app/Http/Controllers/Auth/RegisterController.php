@@ -20,6 +20,7 @@ class RegisterController extends Controller
     |
     */
 
+    //このトレイトがregisterやshow~を定義している
     use RegistersUsers;
 
     /**
