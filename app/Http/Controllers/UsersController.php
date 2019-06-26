@@ -31,6 +31,7 @@ class UsersController extends Controller
         $data += $this->counts($user);
 
         return view('users.show', $data);
+    }
         
     public function followings($id)
     {
@@ -50,6 +51,7 @@ class UsersController extends Controller
     public function followers($id)
     {
         $user = User::find($id);
+        //ここのfollowersはUserモデルのなので中間テーブルのレコードを取得している
         $followers = $user->followers()->paginate(10);
 
         $data = [
@@ -61,4 +63,22 @@ class UsersController extends Controller
 
         return view('users.followers', $data);
     }
+
+    //お気に入り一覧取得・表示
+    public function favorites($id)
+    {
+        //自分の？idを検索してuserモデルのインスタンス
+        $user = User::find($id);
+        //userモデルのfavoritesメソッドでお気に入りを取得
+        $favorites = $user->favorites()->paginate(10);
+
+        $data = [
+            'user' => $user,
+            'microposts' => $favorites,
+        ];
+
+        $data += $this->counts($user);
+
+        return view('users.favorites', $data);
+    } 
 }

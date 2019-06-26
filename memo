@@ -1,0 +1,50 @@
+userに属するマイクロポスト（1対多
+マイクロポストに対するお気に入り
+
+マイグレーションファイル作ったのであとは実行だけ
+
+次は機能の実装
+参考にするビューであるfollowersよりfollowingの方が長いのは、将来的に拡張する予定だから
+
+
+残りは以下
+・favoritesタブからfavoriteができない
+・timelineにフォローユーザーのポストが表示されない
+・timelineにfavoriteボタンが表示されない
+・ドロップダウンメニューにfavoritesが存在しない
+
+
+
+is_favoriteでは、
+Userモデルのfavoritesメソッドでfavoriteテーブルのuser_id（1）とmicropost_id（多）を取得し
+
+
+
+
+△　user.php　の3つの関数favorite, unfavorite, is_favorite（関数名だけで中身はまだ一部コピペ）
+△　favorites.blade.php（followers.blade.phpをコピペしただけなので何も合っていない）
+△　favoritesController（引数は合っている？）
+△　usersControllerの一覧取得（渡すデータとviewは合っている？）
+○　ルーティングであるweb.phpはコピペなので完了
+△　投稿一覧の各ポストの下か横にfavoriteとunfavoriteが走るボタンを設置
+ナビゲーションバーのmy profileの下に追加
+
+いくつかのメソッドがuser対userになっている（follow機能のままになっている）ので、
+user対micropostになるよう修正する
+
+
+
+web.phpより、getのUsersController@favoritesのルーティング名はusers.favorites：followビュー
+同様に、postのUsersController@storeのルーティング名はusers.followers：followアクション
+deleteのUsersController@destroyのルーティング名はusers.unfollow：unfollowアクション
+さらに、Route::group(['prefix' => 'microposts/{id}'], function () {
+            Route::post('favorite', 'FavoritesController@store')->name('favorites.favorite');
+            Route::delete('unfavorite', 'FavoritesController@destroy')->name('favorites.unfavorite');
+これらは上のフォローアンフォローアクションのurlを設定
+
+UsersControllerのfavorites関数はUserモデルから操作しているuserのidを取得
+そのidに紐づく（お気に入りしている）microposts_idをfavoritesテーブルからfavorites関数で取得
+paginate(10)でページネーションして返す
+countsはcontrollerで定義されている関数で（継承しているので使用可能）、そのuserがfavoritesしている数をcount_favoritesに入れて返す
+つまりそれをdata配列に加えた上でviewに渡している
+userのid（user）とfavoriteのid（microposts）（とcount_favorites）を渡して　favoritesビューを表示、これらの値はviewで使用する
